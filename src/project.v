@@ -15,7 +15,7 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-  assign uo_out       = o_ikaopll_main[15: 8];
+  assign uo_out       = { o_D_OE, o_D, o_DAC_EN_MO, o_DAC_EN_RO, o_ikaopll_main[10: 8] };//o_ikaopll_main[15: 8];
   assign uio_out[7:2] = o_ikaopll_main[7 : 2];
   assign uio_out[1:0] = 2'b0;
   assign uio_oe       = 8'b1111_1100;
