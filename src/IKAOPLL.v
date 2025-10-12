@@ -287,6 +287,7 @@ IKAOPLL_pg #(.USE_PIPELINED_MULTIPLIER(USE_PIPELINED_MULTIPLIER)) u_PG (
 //////  EG
 ////
 
+/* REJ: TEMPORARY disable EG
 IKAOPLL_eg u_EG (
     .i_EMUCLK                   (emuclk                     ),
 
@@ -322,7 +323,7 @@ IKAOPLL_eg u_EG (
     .o_OP_ATTNLV                (op_attnlv                  ),
     .o_OP_ATTNLV_MAX            (op_attnlv_max              )
 );
-
+*/
 
 
 ///////////////////////////////////////////////////////////
