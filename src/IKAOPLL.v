@@ -230,6 +230,7 @@ IKAOPLL_reg #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .ALTPATCH_CONFIG_MODE(ALTPA
 //////  LFO
 ////
 
+/* REJ: TEMPORARY disable LFO
 IKAOPLL_lfo u_LFO (
     .i_EMUCLK                   (emuclk                     ),
 
@@ -248,7 +249,7 @@ IKAOPLL_lfo u_LFO (
     .o_PMVAL                    (pmval                      ),
     .o_AMVAL                    (amval                      )
 );
-
+*/
 
 
 ///////////////////////////////////////////////////////////
