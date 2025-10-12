@@ -160,11 +160,11 @@ reg             altpatch_en_reg;
 assign  o_TEST = test_reg;
 assign  o_RHYTHM_EN = rhythm_reg[5];
 
-`ifdef IKAOPLL_ASYNC_RST
-always @(posedge emuclk or negedge i_RST_n)
-`else
+// `ifdef IKAOPLL_ASYNC_RST
+// always @(posedge emuclk or negedge i_RST_n)
+// `else
 always @(posedge emuclk)
-`endif
+// `endif
 begin
     if(!i_RST_n) begin
         am_reg <= 2'b00; pm_reg <= 2'b00; etyp_reg <= 2'b00; ksr_reg <= 2'b00;
