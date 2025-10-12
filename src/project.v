@@ -15,13 +15,68 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
+  assign uo_out       = ikaopll_output[15: 8];
+  assign uio_out[7:2] = ikaopll_output[7 : 2];
+  assign uio_oe       = 8'b1111_1100;
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  ///////////////////////////////////////////////////////////
+  //////  Clocking information
+  ////
+
+  /*
+      phiM(XIN)   ¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|¯|_|
+      prescaler   -3-|-0-|-1-|-2-|-3-|-0-|-1-|-2-|-3-|-0-|-1-|
+      phi1p       ¯|_________|¯¯¯¯¯|_________|¯¯¯¯¯|_________|
+      phi1n       ___|¯¯¯¯¯|_________|¯¯¯¯¯|_________|¯¯¯¯¯|__
+
+      phi1pcen    _______|¯¯¯|___________|¯¯¯|___________|¯¯¯|
+      phi1ncen    ¯¯¯|___________|¯¯¯|___________|¯¯¯|________
+      dacen       ___|¯¯¯|___________|¯¯¯|___________|¯¯¯|____
+  */
+
+  // BUS IO wires
+  wire            IC_n =  rst_n; // chip reset
+  wire [7:0]      DIN  =  ui_in;
+  wire            CS_n =  1'b1;
+  wire            WR_n = ~uio_in[1];
+  wire            A0   =  uio_in[0];
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, 1'b0};
+
+//main chip
+  wire [15:0] ikaopll_output;
+IKAOPLL #(
+    .FULLY_SYNCHRONOUS          (1                          ),
+    .FAST_RESET                 (1                          ),
+    .ALTPATCH_CONFIG_MODE       (0                          ), // VRC7 patch enable
+    .USE_PIPELINED_MULTIPLIER   (1                          )
+) main (
+    .i_XIN_EMUCLK               (clk                        ),
+    .o_XOUT                     (                           ),
+
+    .i_phiM_PCEN_n              (1'b0                       ),
+
+    .i_IC_n                     (IC_n                       ),
+
+    .i_ALTPATCH_EN              (1'b0                       ),
+
+    .i_CS_n                     (CS_n                       ),
+    .i_WR_n                     (WR_n                       ),
+    .i_A0                       (A0                         ),
+
+    .i_D                        (DIN                        ),
+    .o_D                        (                           ),
+    .o_D_OE                     (                           ),
+
+    .o_DAC_EN_MO                (                           ),
+    .o_DAC_EN_RO                (                           ),
+    .o_IMP_NOFLUC_SIGN          (                           ),
+    .o_IMP_NOFLUC_MAG           (                           ),
+    .o_IMP_FLUC_SIGNED_MO       (                           ),
+    .o_IMP_FLUC_SIGNED_RO       (                           ),
+    .o_ACC_SIGNED_STRB          (                           ),
+    .o_ACC_SIGNED               (ikaopll_output             )
+);
 
 endmodule
