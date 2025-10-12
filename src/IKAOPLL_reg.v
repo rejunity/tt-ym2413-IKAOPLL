@@ -133,7 +133,8 @@ endgenerate
 ////
 
 //latch D1REG address, the original chip latches "decoded" register select bits
-reg     [7:0]   d1reg_addr;
+// reg     [7:0]   d1reg_addr; // OLD
+(* fsm_encoding = "none" *) reg     [7:0]   d1reg_addr;
 wire            d1reg_wr_en = ~phi1ncen_n & addrreg_wrrq;
 // always @(posedge emuclk) if(!phi1ncen_n) if(addrreg_wrrq) d1reg_addr <= dbus_inlatch; // OLD
 always @(posedge emuclk) if(d1reg_wr_en) d1reg_addr <= dbus_inlatch; // REJ
