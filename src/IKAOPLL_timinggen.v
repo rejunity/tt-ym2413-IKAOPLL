@@ -41,24 +41,24 @@ wire            ic_n_zzzz;
 wire            phi1_init = ~i_IC_n; // REJ
 wire            ic_n_negedge = 1'b1; // REJ
 
-generate
-if(FULLY_SYNCHRONOUS == 0) begin : FULLY_SYNCHRONOUS_0_reset_syncchain
-    //2 stage SR for synchronization
-    reg     [2:0]   ic_n_internal = 3'b111;
-    always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin 
-        ic_n_internal[0] <= i_IC_n; 
-        ic_n_internal[2:1] <= ic_n_internal[1:0]; //shift
-    end
+// generate
+// if(FULLY_SYNCHRONOUS == 0) begin : FULLY_SYNCHRONOUS_0_reset_syncchain
+//     //2 stage SR for synchronization
+//     reg     [2:0]   ic_n_internal = 3'b111;
+//     always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin 
+//         ic_n_internal[0] <= i_IC_n; 
+//         ic_n_internal[2:1] <= ic_n_internal[1:0]; //shift
+//     end
 
-    //ICn rising edge detector for phi1 phase initialization
-    always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
-        ic_n_negedge <= ic_n_internal[0] & ~ic_n_internal[2];
-    end
+//     //ICn rising edge detector for phi1 phase initialization
+//     always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
+//         ic_n_negedge <= ic_n_internal[0] & ~ic_n_internal[2];
+//     end
 
-    assign  ic_n_zzzz = ic_n_internal[1];
-    assign  o_RST_n = ic_n_internal[2];
-end
-else begin : FULLY_SYNCHRONOUS_1_reset_syncchain
+//     assign  ic_n_zzzz = ic_n_internal[1];
+//     assign  o_RST_n = ic_n_internal[2];
+// end
+// else begin : FULLY_SYNCHRONOUS_1_reset_syncchain
     // OLD
     // //add two stage SR
 
@@ -79,8 +79,8 @@ else begin : FULLY_SYNCHRONOUS_1_reset_syncchain
     // \OLD
 
     assign  o_RST_n = i_IC_n; // REJ
-end
-endgenerate
+// end
+// endgenerate
 
 
 
@@ -107,33 +107,45 @@ wire            phi1p = phisr[1];
 wire            phi1n = phisr[3];
 assign          o_DAC_EN = phisr[0];
 
-generate
-if(FAST_RESET == 0) begin : FAST_RESET_0_phi1gen
-    always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
-        if(phi1_init)   phisr <= 4'b1111; //reset
-        else      begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
-    end
+// always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
+//     if(phi1_init)   phisr <= 4'b1111; //reset
+//     else      begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
+// end
+always @(posedge i_EMUCLK) begin
+    if(phi1_init)   phisr <= 4'b1111; //reset
+    else if(!i_phiM_PCEN_n) begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
 end
-else begin : FAST_RESET_1_phi1gen
-    always @(posedge i_EMUCLK) if(!(i_phiM_PCEN_n & ic_n_zzzz)) begin
-        if(phi1_init)   phisr <= 4'b1111; //reset
-        else      begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
-    end
-end
-endgenerate
 
-generate
-if(FAST_RESET == 0) begin : FAST_RESET_0_cenout
-    //phi1 cen(internal)
-    assign  o_phi1_PCEN_n = phi1p | i_phiM_PCEN_n; //ORed signal
-    assign  o_phi1_NCEN_n = phi1n | i_phiM_PCEN_n;
-end
-else begin : FAST_RESET_1_cenout
-    //phi1 cen(internal)
-    assign  o_phi1_PCEN_n = (phi1p | i_phiM_PCEN_n | ic_n_negedge) & ic_n_zzzz; //ORed signal
-    assign  o_phi1_NCEN_n = (phi1n | i_phiM_PCEN_n | ic_n_negedge) & ic_n_zzzz;
-end
-endgenerate
+assign  o_phi1_PCEN_n = phi1p | i_phiM_PCEN_n; //ORed signal
+assign  o_phi1_NCEN_n = phi1n | i_phiM_PCEN_n;
+
+// generate
+// if(FAST_RESET == 0) begin : FAST_RESET_0_phi1gen
+//     always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
+//         if(phi1_init)   phisr <= 4'b1111; //reset
+//         else      begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
+//     end
+// end
+// else begin : FAST_RESET_1_phi1gen
+//     always @(posedge i_EMUCLK) if(!(i_phiM_PCEN_n & ic_n_zzzz)) begin
+//         if(phi1_init)   phisr <= 4'b1111; //reset
+//         else      begin phisr[3:1] <= phisr[2:0]; phisr[0] <= ~&{phisr} & phisr[3]; end //shift
+//     end
+// end
+// endgenerate
+
+// generate
+// if(FAST_RESET == 0) begin : FAST_RESET_0_cenout
+//     //phi1 cen(internal)
+//     assign  o_phi1_PCEN_n = phi1p | i_phiM_PCEN_n; //ORed signal
+//     assign  o_phi1_NCEN_n = phi1n | i_phiM_PCEN_n;
+// end
+// else begin : FAST_RESET_1_cenout
+//     //phi1 cen(internal)
+//     assign  o_phi1_PCEN_n = (phi1p | i_phiM_PCEN_n | ic_n_negedge) & ic_n_zzzz; //ORed signal
+//     assign  o_phi1_NCEN_n = (phi1n | i_phiM_PCEN_n | ic_n_negedge) & ic_n_zzzz;
+// end
+// endgenerate
 
 
 
@@ -153,12 +165,22 @@ endgenerate
 reg     [2:0]   mcyccntr_lo; // REJ
 reg     [1:0]   mcyccntr_hi; // REJ
 wire    [4:0]   mc = {mcyccntr_hi, mcyccntr_lo};
-always @(posedge i_EMUCLK) if(!phi1ncen_n) begin
+// always @(posedge i_EMUCLK) if(!phi1ncen_n) begin
+//     if(phi1_init) begin
+//         mcyccntr_lo <= 3'd0;
+//         mcyccntr_hi <= 2'd0;
+//     end
+//     else begin
+//         mcyccntr_lo <= (mcyccntr_lo == 3'd5) ? 3'd0 : mcyccntr_lo + 3'd1;
+//         if(mcyccntr_lo == 3'd5) mcyccntr_hi <= (mcyccntr_hi == 2'd2) ? 2'd0 : mcyccntr_hi + 2'd1;
+//     end
+// end
+always @(posedge i_EMUCLK) begin
     if(phi1_init) begin
         mcyccntr_lo <= 3'd0;
         mcyccntr_hi <= 2'd0;
     end
-    else begin
+    else if(!phi1ncen_n) begin
         mcyccntr_lo <= (mcyccntr_lo == 3'd5) ? 3'd0 : mcyccntr_lo + 3'd1;
         if(mcyccntr_lo == 3'd5) mcyccntr_hi <= (mcyccntr_hi == 2'd2) ? 2'd0 : mcyccntr_hi + 2'd1;
     end
