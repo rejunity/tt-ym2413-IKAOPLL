@@ -36,8 +36,10 @@ wire            phi1ncen_n = o_phi1_NCEN_n;
 ////
 
 wire            ic_n_zzzz;
-reg             ic_n_negedge = 1'b1; //IC_n negedge detector
-wire            phi1_init = ic_n_negedge;
+// OLD: reg             ic_n_negedge = 1'b1; //IC_n negedge detector
+// OLD: wire            phi1_init = ic_n_negedge;
+wire            phi1_init = ~i_IC_n; // REJ
+wire            ic_n_negedge = 1'b1; // REJ
 
 generate
 if(FULLY_SYNCHRONOUS == 0) begin : FULLY_SYNCHRONOUS_0_reset_syncchain
@@ -57,22 +59,26 @@ if(FULLY_SYNCHRONOUS == 0) begin : FULLY_SYNCHRONOUS_0_reset_syncchain
     assign  o_RST_n = ic_n_internal[2];
 end
 else begin : FULLY_SYNCHRONOUS_1_reset_syncchain
-    //add two stage SR
+    // OLD
+    // //add two stage SR
 
-    //4 stage SR for synchronization
-    reg     [4:0]   ic_n_internal = 5'b11111;
-    always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin 
-        ic_n_internal[0] <= i_IC_n; 
-        ic_n_internal[4:1] <= ic_n_internal[3:0]; //shift
-    end
+    // //4 stage SR for synchronization
+    // reg     [4:0]   ic_n_internal = 5'b11111;
+    // always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin 
+    //     ic_n_internal[0] <= i_IC_n; 
+    //     ic_n_internal[4:1] <= ic_n_internal[3:0]; //shift
+    // end
 
-    //ICn rising edge detector for phi1 phase initialization
-    always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
-        ic_n_negedge <= ic_n_internal[2] & ~ic_n_internal[4];
-    end
+    // //ICn rising edge detector for phi1 phase initialization
+    // always @(posedge i_EMUCLK) if(!i_phiM_PCEN_n) begin
+    //     ic_n_negedge <= ic_n_internal[2] & ~ic_n_internal[4];
+    // end
 
-    assign  ic_n_zzzz = ic_n_internal[3];
-    assign  o_RST_n = ic_n_internal[4];
+    // assign  ic_n_zzzz = ic_n_internal[3];
+    // assign  o_RST_n = ic_n_internal[4];
+    // \OLD
+
+    assign  o_RST_n = i_IC_n; // REJ
 end
 endgenerate
 
@@ -142,8 +148,10 @@ endgenerate
     16 17 18 19 20 21
 */
 
-reg     [2:0]   mcyccntr_lo = 3'd0;
-reg     [1:0]   mcyccntr_hi = 2'd0;
+// OLD: reg     [2:0]   mcyccntr_lo = 3'd0;
+// OLD: reg     [1:0]   mcyccntr_hi = 2'd0;
+reg     [2:0]   mcyccntr_lo; // REJ
+reg     [1:0]   mcyccntr_hi; // REJ
 wire    [4:0]   mc = {mcyccntr_hi, mcyccntr_lo};
 always @(posedge i_EMUCLK) if(!phi1ncen_n) begin
     if(phi1_init) begin
