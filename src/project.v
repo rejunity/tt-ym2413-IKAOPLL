@@ -46,7 +46,7 @@ module tt_um_rejunity_ym2413_ika_opll (
 
 
 // main chip
-  wire                o_XOUT;
+  // wire                o_XOUT;
   wire        [1:0]   o_D;
   wire                o_D_OE;
   wire                o_DAC_EN_MO;
@@ -65,7 +65,7 @@ IKAOPLL #(
     .USE_PIPELINED_MULTIPLIER   (1                          )
 ) main (
     .i_XIN_EMUCLK               (clk                        ),
-    .o_XOUT                                                  ,
+    // .o_XOUT                                                  ,
 
     .i_phiM_PCEN_n              (1'b0                       ),
 

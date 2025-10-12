@@ -6,7 +6,7 @@ module IKAOPLL #(
     ) (
     //chip clock
     input   wire                i_XIN_EMUCLK, //emulator master clock, same as XIN
-    output  wire                o_XOUT,
+    // output  wire                o_XOUT,
 
     //clock enables
     input   wire                i_phiM_PCEN_n, //phiM positive edge clock enable(negative logic)
@@ -73,7 +73,7 @@ module IKAOPLL #(
 
 //master clock
 wire            emuclk = i_XIN_EMUCLK;
-assign  o_XOUT = ~emuclk;
+// assign  o_XOUT = ~emuclk;
 
 //divided clock
 wire            phi1pcen_n, phi1ncen_n, dac_en;
