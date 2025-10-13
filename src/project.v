@@ -63,7 +63,8 @@ IKAOPLL #(
     // OLD: .FAST_RESET                 (1                          ),
     .FAST_RESET                 (0                          ),
     .ALTPATCH_CONFIG_MODE       (0                          ), // VRC7 patch enable
-    .USE_PIPELINED_MULTIPLIER   (1                          )
+    // OLD: .USE_PIPELINED_MULTIPLIER   (1                          )
+    .USE_PIPELINED_MULTIPLIER   (0                          )
 ) main (
     .i_XIN_EMUCLK               (clk                        ),
     .o_XOUT                                                  ,
