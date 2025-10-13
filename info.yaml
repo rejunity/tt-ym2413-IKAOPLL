@@ -52,9 +52,9 @@ pinout:
   uo[7]: ""
 
   # Bidirectional pins
-  uio[0]: "(in) **A0** LSB bit of address bus"
-  uio[1]: "(in) **WR** write"
-  uio[2]: ""
+  uio[0]: "(in) **A0** register latch"
+  uio[1]: "(in) **CS** chip select"
+  uio[2]: "(in) **WR** write"
   uio[3]: ""
   uio[4]: ""
   uio[5]: ""

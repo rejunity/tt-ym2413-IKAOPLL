@@ -16,9 +16,9 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       rst_n     // reset_n - low to reset
 );
   assign uo_out       = { o_D_OE, o_D, o_DAC_EN_MO, o_DAC_EN_RO, o_ikaopll_main[10: 8] };//o_ikaopll_main[15: 8];
-  assign uio_out[7:2] = o_ikaopll_main[7 : 2];
-  assign uio_out[1:0] = 2'b0;
-  assign uio_oe       = 8'b1111_1100;
+  assign uio_out[7:3] = o_ikaopll_main[7 : 3];
+  assign uio_out[2:0] = 3'b0;
+  assign uio_oe       = 8'b1111_1000; // (active high: 0=input, 1=output)
 
   ///////////////////////////////////////////////////////////
   //////  Clocking information
@@ -38,9 +38,9 @@ module tt_um_rejunity_ym2413_ika_opll (
   // BUS IO wires
   wire            IC_n =  rst_n; // chip reset
   wire [7:0]      DIN  =  ui_in;
-  wire            CS_n =  1'b1;
-  wire            WR_n = ~uio_in[1];
   wire            A0   =  uio_in[0];
+  wire            CS_n = ~uio_in[1];
+  wire            WR_n = ~uio_in[2];
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, 1'b0};
