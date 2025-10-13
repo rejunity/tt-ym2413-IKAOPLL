@@ -60,7 +60,8 @@ module tt_um_rejunity_ym2413_ika_opll (
   wire signed [15:0]  o_ikaopll_main;
 IKAOPLL #(
     .FULLY_SYNCHRONOUS          (1                          ),
-    .FAST_RESET                 (1                          ),
+    // OLD: .FAST_RESET                 (1                          ),
+    .FAST_RESET                 (0                          ),
     .ALTPATCH_CONFIG_MODE       (0                          ), // VRC7 patch enable
     .USE_PIPELINED_MULTIPLIER   (1                          )
 ) main (
