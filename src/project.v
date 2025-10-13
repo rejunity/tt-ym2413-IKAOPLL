@@ -89,6 +89,8 @@ IKAOPLL #(
     .o_IMP_NOFLUC_MAG                                        ,
     .o_IMP_FLUC_SIGNED_MO                                    ,
     .o_IMP_FLUC_SIGNED_RO                                    ,
+    .i_ACC_SIGNED_MOVOL         (5'sd8                      ),
+    .i_ACC_SIGNED_ROVOL         (5'sd8                      ),
     .o_ACC_SIGNED_STRB                                       ,
     .o_ACC_SIGNED               (o_ikaopll_main             )
 );
