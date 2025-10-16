@@ -17,6 +17,8 @@ module tb ();
     #1;
   end
 
+  wire [16:0] master = 16'sd32767 + $signed({uo_out, uio_out});
+
   // Wire up the inputs and outputs:
   reg clk;
   reg rst_n;
