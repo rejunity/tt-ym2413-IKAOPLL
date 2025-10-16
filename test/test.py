@@ -86,7 +86,7 @@ async def test_ym_sine(dut):
     await set_register(dut, 0x06, 0x0F)
     await set_register(dut, 0x07, 0x0F)
     await set_register(dut, 0x10, 0xAC) # 0x61)
-    await set_register(dut, 0x30, 0x02) # volume=0 (the maximum volume setting) actually it is attenuation!
+    await set_register(dut, 0x30, 0x00) # volume=0 (the maximum volume setting) actually it is attenuation!
     await set_register(dut, 0x20, 0x1C) # 0x12)
     # This sets up a custom instrument that plays a sine wave (regs 0-7) and then plays this instrument on channel 0 with maximum volume. 
 
