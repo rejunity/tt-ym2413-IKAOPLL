@@ -32,9 +32,10 @@ async def set_register(dut, reg, value, wait = 800, wait_between_writes = 150):
 async def reset(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 1 us (1 MHz) TODO should be 3.5MHz (NTSC freq)
-    clock = Clock(dut.clk, 1, unit="us")
-    # clock = Clock(dut.clk, 1, units="us")
+    # Set the clock period to 280 ns 3.579 MHz - NTSC frequency
+    # NTSC is default expected clock for YM2413
+    clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, unit ="ns")
+    # clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
