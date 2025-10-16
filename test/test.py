@@ -34,8 +34,8 @@ async def reset(dut):
 
     # Set the clock period to 280 ns 3.579 MHz - NTSC frequency
     # NTSC is default expected clock for YM2413
-    clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, unit ="ns")
-    # clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, units="ns")
+    # clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, unit ="ns")
+    clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
