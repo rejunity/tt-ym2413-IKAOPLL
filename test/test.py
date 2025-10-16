@@ -5,18 +5,20 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
-async def set_register(dut, reg, value, wait = 0, wait_between_writes = 0):
+NTSC_FREQ = 3_579_545
+
+async def set_register(dut, reg, value, wait = 800, wait_between_writes = 150):
     async def write(dut, a0, value):
-        # [WR, CS, A0]
-        dut.uio_in.value = 0b110 | a0   # @(posedge i_CLK) o_A0 = i_TARGET_ADDR;
+        # MSB [..., WR, CS, A0] LSB
+        dut.uio_in.value = 0b000 | a0   # @(posedge i_CLK) o_A0 = i_TARGET_ADDR;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b100 | a0   # @(negedge i_CLK) o_CS_n = 1'b0;
+        dut.uio_in.value = 0b010 | a0   # @(negedge i_CLK) o_CS_n = 1'b0;
         await ClockCycles(dut.clk, 1)
-        dut.ui_in.value = reg           # @(posedge i_CLK) o_DATA = i_WRITE_DATA;
+        dut.ui_in.value = value         # @(posedge i_CLK) o_DATA = i_WRITE_DATA;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b000 | a0   # @(negedge i_CLK) o_WR_n = 1'b0;
+        dut.uio_in.value = 0b110 | a0   # @(negedge i_CLK) o_WR_n = 1'b0;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b110 | a0   # @(negedge i_CLK) o_WR_n = 1'b1; o_CS_n = 1'b1;
+        dut.uio_in.value = 0b000 | a0   # @(negedge i_CLK) o_WR_n = 1'b1; o_CS_n = 1'b1;
         await ClockCycles(dut.clk, 1)
         # TODO: set data bus to high impedance @(posedge i_CLK) o_DATA = 8'hZZ;
 
@@ -26,13 +28,13 @@ async def set_register(dut, reg, value, wait = 0, wait_between_writes = 0):
     await write(dut, 1, value)
     if wait > 0:                await ClockCycles(dut.clk, wait)
 
-@cocotb.test()
-async def test_reset(dut):
+
+async def reset(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
-    # clock = Clock(dut.clk, 10, units="us")
+    # Set the clock period to 1 us (1 MHz) TODO should be 3.5MHz (NTSC freq)
+    clock = Clock(dut.clk, 1, unit="us")
+    # clock = Clock(dut.clk, 1, units="us")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -41,52 +43,65 @@ async def test_reset(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 100) # has to be at least 72 cycles long to reset internal d9reg
     dut.rst_n.value = 1
-    dut.uio_in.value = 0b110 # /WR=1, /CS=1, A0=0
+    dut.uio_in.value = 0b000 # WR=0, CS=0, A0=0
+
+    return clock
+
+@cocotb.test()
+async def test_reset(dut):
+    await reset(dut)
 
     dut._log.info("Settle")
     await ClockCycles(dut.clk, 1000) # settle
 
-    for n in range(10):
-        dut.uio_in.value = 0b111
-        await ClockCycles(dut.clk, 1)
-        print(dut.uo_out, dut.uio_out)
+@cocotb.test()
+async def test_ym_sine(dut):
+    await reset(dut)
 
-    for n in range(10):
-        dut.uio_in.value = 0b100
-        await ClockCycles(dut.clk, 1)
-        print(dut.uo_out, dut.uio_out)
+    dut._log.info("Settle")
+    await ClockCycles(dut.clk, 100)
 
-    for n in range(10):
-        dut.uio_in.value = 0b000
-        await ClockCycles(dut.clk, 1)
-        print(dut.uo_out, dut.uio_out)
+    dut._log.info("YM reg write: custom sine instrument from https://www.smspower.org/Development/YM2413ReverseEngineeringNotes2015-02-09")
+    # see https://www.smspower.org/Development/YM2413ReverseEngineeringNotes2015-02-09 "Sampling the YM2413 output"    # Very simple test program: writes the following YM2413 registers
+    # R#0x00 = 0x20
+    # R#0x01 = 0x20
+    # R#0x02 = 0x3F
+    # R#0x03 = 0x00
+    # R#0x04 = 0xFF
+    # R#0x05 = 0xFF
+    # R#0x06 = 0x0F
+    # R#0x07 = 0x0F
+    # R#0x10 = 0x61
+    # R#0x30 = 0x00
+    # R#0x20 = 0x12    
+    await set_register(dut, 0x00, 0x20)
+    await set_register(dut, 0x01, 0x20)
+    await set_register(dut, 0x02, 0x3F)
+    await set_register(dut, 0x03, 0x00)
+    await set_register(dut, 0x04, 0xFF)
+    await set_register(dut, 0x05, 0xFF)
+    await set_register(dut, 0x06, 0x0F)
+    await set_register(dut, 0x07, 0x0F)
+    await set_register(dut, 0x10, 0xAC) # 0x61)
+    await set_register(dut, 0x30, 0x02) # volume=0 (the maximum volume setting) actually it is attenuation!
+    await set_register(dut, 0x20, 0x1C) # 0x12)
+    # This sets up a custom instrument that plays a sine wave (regs 0-7) and then plays this instrument on channel 0 with maximum volume. 
+
+    dut._log.info("YM playing")
+    await ClockCycles(dut.clk, 32000)
+    dut._log.info("Done")
+
 
 @cocotb.test()
-async def test_ym(dut):
-    dut._log.info("Start")
-
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
-    # clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 1
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
-    dut.uio_in.value = 0b110 # /WR=1, /CS=1, A0=0
+async def test_ym_custom_instrument(dut):
+    await reset(dut)
 
     dut._log.info("Settle")
     await ClockCycles(dut.clk, 1500) # settle
 
     dut._log.info("YM reg write: custom instrument")
-    await set_register(dut, 0x00, 0x00, wait=100, wait_between_writes=100)
     await set_register(dut, 0x00, 0x00, wait=100, wait_between_writes=100)
     await set_register(dut, 0x01, 0x00, wait=100, wait_between_writes=100)
     await set_register(dut, 0x02, 0x00, wait=100, wait_between_writes=100)
@@ -95,6 +110,23 @@ async def test_ym(dut):
     await set_register(dut, 0x05, 0x59, wait=100, wait_between_writes=100)
     await set_register(dut, 0x06, 0x30, wait=100, wait_between_writes=100)
     await set_register(dut, 0x07, 0x59, wait=100, wait_between_writes=100)
+    
+    # inst test
+    dut._log.info("YM reg write: instrument test")
+    await set_register(dut, 0x10, 0xAC, wait=800, wait_between_writes=150)
+    await set_register(dut, 0x20, 0x17, wait=800, wait_between_writes=150) # key on
+    await set_register(dut, 0x30, 0xE0, wait=800, wait_between_writes=150)
+    dut._log.info("YM playing")
+    await ClockCycles(dut.clk, 32000)
+    dut._log.info("YM reg write: instrument key off")
+    await set_register(dut, 0x20, 0x07, wait=800, wait_between_writes=150) # key off
+
+@cocotb.test()
+async def test_ym_rhytm(dut):
+    await reset(dut)
+
+    dut._log.info("Settle")
+    await ClockCycles(dut.clk, 1500) # settle
 
     # rhythm
     dut._log.info("YM reg write: rhytm")
@@ -106,13 +138,93 @@ async def test_ym(dut):
     await set_register(dut, 0x28, 0x01, wait=800, wait_between_writes=150)
     await set_register(dut, 0x0E, 0x30, wait=100, wait_between_writes=100)
     
-    # inst test
-    dut._log.info("YM reg write: instrument test")
-    await set_register(dut, 0x10, 0xAC, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x30, 0xE0, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x20, 0x17, wait=800, wait_between_writes=150)
     dut._log.info("YM playing")
-    # await ClockCycles(dut.clk, 320000) # long wait
     await ClockCycles(dut.clk, 32000)
-    dut._log.info("YM reg write: instrument close")
-    await set_register(dut, 0x20, 0x07, wait=800, wait_between_writes=150)
+
+# @cocotb.test()
+async def test_ym_instruments(dut):
+    await reset(dut)
+
+    dut._log.info("Settle")
+    await ClockCycles(dut.clk, 1500) # settle
+
+    dut._log.info("YM reg write: reset")
+    for n in range(0x0F):
+        await set_register(dut, n, 0x00, wait=100, wait_between_writes=100)
+    
+    dut._log.info("YM reg write: instruments")
+    # fnum@[7:0]
+    await set_register(dut, 0x10, 0xAC)
+    await set_register(dut, 0x11, 0xAC)
+    await set_register(dut, 0x12, 0xAC)
+    await set_register(dut, 0x13, 0xAC)
+    await set_register(dut, 0x14, 0xAC)
+    await set_register(dut, 0x15, 0xAC)
+    await set_register(dut, 0x16, 0xAC)
+    await set_register(dut, 0x17, 0xAC)
+    await set_register(dut, 0x18, 0xAC)
+
+    # key@[4], block@[3:1], fnum_msb@[0] 
+    await set_register(dut, 0x20, 0x00|(0<<1))
+    await set_register(dut, 0x21, 0x00|(1<<1))
+    await set_register(dut, 0x22, 0x00|(2<<1))
+    await set_register(dut, 0x23, 0x00|(3<<1))
+    await set_register(dut, 0x24, 0x00|(4<<1))
+    await set_register(dut, 0x25, 0x00|(5<<1))
+    await set_register(dut, 0x26, 0x00|(6<<1))
+    await set_register(dut, 0x27, 0x00|(7<<1))
+    await set_register(dut, 0x28, 0x00|(4<<1))
+
+    await set_register(dut, 0x21, 0x12|(7<<1))
+    await set_register(dut, 0x22, 0x12|(7<<1))
+    await set_register(dut, 0x23, 0x12|(7<<1))
+
+    # intrument@[7:4], volume@[3:0]
+    await set_register(dut, 0x30, 0x0F)
+    await set_register(dut, 0x31, 0x1C)
+    await set_register(dut, 0x32, 0x2C)
+    await set_register(dut, 0x33, 0x3C)
+    await set_register(dut, 0x34, 0x4C)
+    await set_register(dut, 0x35, 0x5C)
+    await set_register(dut, 0x36, 0x10)
+    await set_register(dut, 0x37, 0x10)
+    await set_register(dut, 0x38, 0x10)
+
+    dut._log.info("YM playing")
+    await ClockCycles(dut.clk, 32000)
+
+    dut._log.info("YM reg write: instrument key off")
+    await set_register(dut, 0x20, 0x18)
+    await set_register(dut, 0x21, 0x18)
+
+
+  #  #1700000;
+  #   `DD IKAOPLL_write(1'b0, 8'h21, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h02, phiMref, CS_n, WR_n, A0, DIN);
+
+  #   #1000000;
+  #   `DD IKAOPLL_write(1'b0, 8'h21, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h32, phiMref, CS_n, WR_n, A0, DIN);
+
+  #   #1700000;
+  #   `DD IKAOPLL_write(1'b0, 8'h0E, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h3F, phiMref, CS_n, WR_n, A0, DIN);
+  #   `DD IKAOPLL_write(1'b0, 8'h21, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h22, phiMref, CS_n, WR_n, A0, DIN);
+
+  #   #2000000;
+  #   `DD IKAOPLL_write(1'b0, 8'h0E, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h20, phiMref, CS_n, WR_n, A0, DIN);
+  #   #100 IKAOPLL_write(1'b0, 8'h00, phiMref, CS_n, WR_n, A0, DIN);
+  #   #100 IKAOPLL_write(1'b1, 8'h20, phiMref, CS_n, WR_n, A0, DIN);
+  #   #100 IKAOPLL_write(1'b0, 8'h01, phiMref, CS_n, WR_n, A0, DIN);
+  #   #100 IKAOPLL_write(1'b1, 8'h20, phiMref, CS_n, WR_n, A0, DIN);
+
+  #   #1000000;
+  #   `DD IKAOPLL_write(1'b0, 8'h21, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h12, phiMref, CS_n, WR_n, A0, DIN);
+
+  #   #1700000;
+  #   `DD IKAOPLL_write(1'b0, 8'h21, phiMref, CS_n, WR_n, A0, DIN);
+  #   `AD IKAOPLL_write(1'b1, 8'h02, phiMref, CS_n, WR_n, A0, DIN);
+  # 
