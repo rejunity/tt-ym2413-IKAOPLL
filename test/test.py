@@ -50,6 +50,13 @@ async def reset(dut):
 
     return clock
 
+async def play(dut, ms = 10):
+    dut._log.info(f"YM playing for {ms}ms...")
+    cycles_per_step = 1000
+    for n in range(NTSC_FREQ * ms // (1000 * cycles_per_step)):
+        await ClockCycles(dut.clk, cycles_per_step)
+        print(dut.uo_out.value)
+
 @cocotb.test()
 async def test_reset(dut):
     await reset(dut)
@@ -90,8 +97,8 @@ async def test_ym_sine(dut):
     await set_register(dut, 0x20, 0x1C) # 0x12)
     # This sets up a custom instrument that plays a sine wave (regs 0-7) and then plays this instrument on channel 0 with maximum volume. 
 
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
+
     dut._log.info("Done")
 
 
@@ -118,7 +125,9 @@ async def test_ym_custom_instrument(dut):
     await set_register(dut, 0x20, 0x17, wait=800, wait_between_writes=150) # key on
     await set_register(dut, 0x30, 0xE0, wait=800, wait_between_writes=150)
     dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    
+    await play(dut)
+
     dut._log.info("YM reg write: instrument key off")
     await set_register(dut, 0x20, 0x07, wait=800, wait_between_writes=150) # key off
 
@@ -139,8 +148,7 @@ async def test_ym_rhytm(dut):
     await set_register(dut, 0x28, 0x01, wait=800, wait_between_writes=150)
     await set_register(dut, 0x0E, 0x30, wait=100, wait_between_writes=100)
     
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
 
 # @cocotb.test()
 async def test_ym_instruments(dut):
@@ -191,8 +199,7 @@ async def test_ym_instruments(dut):
     await set_register(dut, 0x37, 0x10)
     await set_register(dut, 0x38, 0x10)
 
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
 
     dut._log.info("YM reg write: instrument key off")
     await set_register(dut, 0x20, 0x18)
