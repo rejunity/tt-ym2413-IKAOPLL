@@ -26,7 +26,7 @@ project:
     - "IKAOPLL_pg.v"
     - "IKAOPLL_primitives.v"
     - "IKAOPLL_reg.v"
-    - "IKAOPLL_timinggen.v"
+    - "IKAOPLL_timinggen_asic.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

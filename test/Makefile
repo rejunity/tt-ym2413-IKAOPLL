@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v IKAOPLL.v IKAOPLL_dac.v IKAOPLL_eg.v IKAOPLL_lfo.v IKAOPLL_op.v IKAOPLL_pg.v IKAOPLL_primitives.v IKAOPLL_reg.v IKAOPLL_timinggen.v
+PROJECT_SOURCES = project.v IKAOPLL.v IKAOPLL_dac.v IKAOPLL_eg.v IKAOPLL_lfo.v IKAOPLL_op.v IKAOPLL_pg.v IKAOPLL_primitives.v IKAOPLL_reg.v IKAOPLL_timinggen_asic.v
 
 ifneq ($(GATES),yes)
 
