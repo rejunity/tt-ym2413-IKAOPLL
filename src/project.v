@@ -15,8 +15,10 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-  assign uo_out       = { o_D_OE, o_D, o_DAC_EN_MO, o_DAC_EN_RO, o_ikaopll_main[10: 8] };//o_ikaopll_main[15: 8];
-  assign uio_out[7:3] = o_ikaopll_main[7 : 3];
+  // assign uo_out       = { o_D_OE, o_D, o_DAC_EN_MO, o_DAC_EN_RO, o_ikaopll_main[10: 8] };//o_ikaopll_main[15: 8];
+  // assign uio_out[7:3] = o_ikaopll_main[7 : 3];
+  assign uo_out       = { o_ikaopll_main[15: 8] };
+  assign uio_out[7:3] = { o_ikaopll_main[7 : 5], o_DAC_EN_RO, o_DAC_EN_MO };
   assign uio_out[2:0] = 3'b0;
   assign uio_oe       = 8'b1111_1000; // (active high: 0=input, 1=output)
 
@@ -175,8 +177,8 @@ IKAOPLL #(
     .o_IMP_NOFLUC_MAG                                        ,
     .o_IMP_FLUC_SIGNED_MO                                    ,
     .o_IMP_FLUC_SIGNED_RO                                    ,
-    .i_ACC_SIGNED_MOVOL         (5'sd8                      ),
-    .i_ACC_SIGNED_ROVOL         (5'sd8                      ),
+    .i_ACC_SIGNED_MOVOL         (5'sd15                     ),
+    .i_ACC_SIGNED_ROVOL         (5'sd15                     ),
     .o_ACC_SIGNED_STRB                                       ,
     .o_ACC_SIGNED               (o_ikaopll_main             )
 );

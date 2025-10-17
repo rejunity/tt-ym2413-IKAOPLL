@@ -130,7 +130,8 @@ wire    [8:0]   dac_opdata;
 //////  TIMING GENERATOR
 ////
 
-IKAOPLL_timinggen #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .FAST_RESET(FAST_RESET)) u_TIMINGGEN (
+// IKAOPLL_timinggen #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .FAST_RESET(FAST_RESET)) u_TIMINGGEN (
+IKAOPLL_timinggen u_TIMINGGEN (
     .i_EMUCLK                   (emuclk                     ),
     .i_phiM_PCEN_n              (i_phiM_PCEN_n              ),
 

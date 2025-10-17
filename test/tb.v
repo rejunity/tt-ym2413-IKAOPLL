@@ -9,7 +9,11 @@ module tb ();
   // Dump the signals to a VCD file. You can view it with gtkwave or surfer.
   initial begin
     $dumpfile("tb.vcd");
+`ifdef GL_TEST
+    $dumpvars(1, tb);
+`else
     $dumpvars(0, tb);
+`endif
     #1;
   end
 
@@ -44,5 +48,15 @@ module tb ();
       .clk    (clk),      // clock
       .rst_n  (rst_n)     // not reset
   );
+
+  wire            IC   =  ~rst_n;
+  wire [7:0]      DIN  =  ui_in;
+  wire            A0   =  uio_in[0];
+  wire            CS   =  uio_in[1];
+  wire            WR   =  uio_in[2];
+
+  wire            melody = uio_out[3];
+  wire            rhytm  = uio_out[4];
+  wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out[7:5]});
 
 endmodule

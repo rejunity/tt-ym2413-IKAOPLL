@@ -7,7 +7,11 @@ from cocotb.triggers import ClockCycles
 
 NTSC_FREQ = 3_579_545
 
-async def set_register(dut, reg, value, wait = 800, wait_between_writes = 150):
+# According to YM2413 Application Manual
+# (page 4, table II - 2, "Wait times")
+# have to avoid bus&signal changes for 1) 12 cycles after ADDRESS write
+#                                      2) 84 cycles after DATA write
+async def set_register(dut, reg, value, wait = 84, wait_between_writes = 12):
     async def write(dut, a0, value):
         # MSB [..., WR, CS, A0] LSB
         dut.uio_in.value = 0b000 | a0   # @(posedge i_CLK) o_A0 = i_TARGET_ADDR;
@@ -34,8 +38,8 @@ async def reset(dut):
 
     # Set the clock period to 280 ns 3.579 MHz - NTSC frequency
     # NTSC is default expected clock for YM2413
-    clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, unit ="ns")
-    # clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, units="ns")
+    # clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, unit ="ns")
+    clock = Clock(dut.clk, 1_000_000_000 // NTSC_FREQ, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -44,11 +48,21 @@ async def reset(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 100) # has to be at least 72 cycles long to reset internal d9reg
+    # According to YM2413 Application Manual
+    # (page 25, "AC Characteristics" & Figure A - 2 "Reset Timing")
+    # RESET pulse width must be not shorter than 80 cycles
+    await ClockCycles(dut.clk, 80)
     dut.rst_n.value = 1
     dut.uio_in.value = 0b000 # WR=0, CS=0, A0=0
 
     return clock
+
+async def play(dut, ms = 10):
+    dut._log.info(f"YM playing for {ms}ms...")
+    cycles_per_step = 1000
+    for n in range(NTSC_FREQ * ms // (1000 * cycles_per_step)):
+        await ClockCycles(dut.clk, cycles_per_step)
+        print(dut.uo_out.value)
 
 @cocotb.test()
 async def test_reset(dut):
@@ -86,12 +100,12 @@ async def test_ym_sine(dut):
     await set_register(dut, 0x06, 0x0F)
     await set_register(dut, 0x07, 0x0F)
     await set_register(dut, 0x10, 0xAC) # 0x61)
-    await set_register(dut, 0x30, 0x02) # volume=0 (the maximum volume setting) actually it is attenuation!
+    await set_register(dut, 0x30, 0x00) # volume=0 (the maximum volume setting) actually it is attenuation!
     await set_register(dut, 0x20, 0x1C) # 0x12)
     # This sets up a custom instrument that plays a sine wave (regs 0-7) and then plays this instrument on channel 0 with maximum volume. 
 
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
+
     dut._log.info("Done")
 
 
@@ -103,22 +117,23 @@ async def test_ym_custom_instrument(dut):
     await ClockCycles(dut.clk, 1500) # settle
 
     dut._log.info("YM reg write: custom instrument")
-    await set_register(dut, 0x00, 0x00, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x01, 0x00, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x02, 0x00, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x03, 0x18, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x04, 0x7A, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x05, 0x59, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x06, 0x30, wait=100, wait_between_writes=100)
-    await set_register(dut, 0x07, 0x59, wait=100, wait_between_writes=100)
+    await set_register(dut, 0x00, 0x00)
+    await set_register(dut, 0x01, 0x00)
+    await set_register(dut, 0x02, 0x00)
+    await set_register(dut, 0x03, 0x18)
+    await set_register(dut, 0x04, 0x7A)
+    await set_register(dut, 0x05, 0x59)
+    await set_register(dut, 0x06, 0x30)
+    await set_register(dut, 0x07, 0x59)
     
     # inst test
     dut._log.info("YM reg write: instrument test")
-    await set_register(dut, 0x10, 0xAC, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x20, 0x17, wait=800, wait_between_writes=150) # key on
-    await set_register(dut, 0x30, 0xE0, wait=800, wait_between_writes=150)
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await set_register(dut, 0x10, 0xAC)
+    await set_register(dut, 0x20, 0x17) # key on
+    await set_register(dut, 0x30, 0xE0)
+    
+    await play(dut)
+
     dut._log.info("YM reg write: instrument key off")
     await set_register(dut, 0x20, 0x07, wait=800, wait_between_writes=150) # key off
 
@@ -131,16 +146,15 @@ async def test_ym_rhytm(dut):
 
     # rhythm
     dut._log.info("YM reg write: rhytm")
-    await set_register(dut, 0x16, 0x20, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x17, 0x50, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x18, 0xC0, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x26, 0x05, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x27, 0x05, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x28, 0x01, wait=800, wait_between_writes=150)
-    await set_register(dut, 0x0E, 0x30, wait=100, wait_between_writes=100)
+    await set_register(dut, 0x16, 0x20)
+    await set_register(dut, 0x17, 0x50)
+    await set_register(dut, 0x18, 0xC0)
+    await set_register(dut, 0x26, 0x05)
+    await set_register(dut, 0x27, 0x05)
+    await set_register(dut, 0x28, 0x01)
+    await set_register(dut, 0x0E, 0x30)
     
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
 
 # @cocotb.test()
 async def test_ym_instruments(dut):
@@ -191,8 +205,7 @@ async def test_ym_instruments(dut):
     await set_register(dut, 0x37, 0x10)
     await set_register(dut, 0x38, 0x10)
 
-    dut._log.info("YM playing")
-    await ClockCycles(dut.clk, 32000)
+    await play(dut)
 
     dut._log.info("YM reg write: instrument key off")
     await set_register(dut, 0x20, 0x18)
