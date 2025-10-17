@@ -44,7 +44,10 @@ async def reset(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 100) # has to be at least 72 cycles long to reset internal d9reg
+    # According to YM2413 Application Manual
+    # (page 25, "AC Characteristics" & Figure A - 2 "Reset Timing")
+    # RESET pulse width must be not shorter than 80 cycles
+    await ClockCycles(dut.clk, 80)
     dut.rst_n.value = 1
     dut.uio_in.value = 0b000 # WR=0, CS=0, A0=0
 
