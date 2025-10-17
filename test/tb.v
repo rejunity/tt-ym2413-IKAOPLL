@@ -56,4 +56,7 @@ module tb ();
   wire            WR   =  uio_in[2];
   wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out});
 
+  wire            melody = uio_out[3];
+  wire            rhytm  = uio_out[4];
+
 endmodule
