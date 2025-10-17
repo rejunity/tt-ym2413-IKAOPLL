@@ -67,7 +67,7 @@ for(stage = 0; stage < LENGTH-1; stage = stage + 1) begin : primitive_sr
         //  leading to a more complex layout and longer wiring!
         //
         // See: https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dlygate4sd3/README.html
-        sky130_fd_sc_hd__dlygate4sd3_1 sr_dlygate[17:0] ( .A(sr[stage]), .X(sr_buf[stage]) );
+        sky130_fd_sc_hd__dlygate4sd3_1 sr_dlygate[WIDTH-1:0] ( .A(sr[stage]), .X(sr_buf[stage]) );
     `endif
     /* verilator lint_on PINMISSING */
     /* verilator lint_on GENUNNAMED */
