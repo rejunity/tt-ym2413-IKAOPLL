@@ -54,9 +54,9 @@ module tb ();
   wire            A0   =  uio_in[0];
   wire            CS   =  uio_in[1];
   wire            WR   =  uio_in[2];
-  wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out});
 
   wire            melody = uio_out[3];
   wire            rhytm  = uio_out[4];
+  wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out[7:5]});
 
 endmodule
