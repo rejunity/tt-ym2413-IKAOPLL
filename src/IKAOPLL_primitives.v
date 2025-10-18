@@ -40,7 +40,7 @@ module IKAOPLL_sr #(parameter WIDTH = 1, parameter LENGTH = 9, parameter TAP0 = 
 );
 
 reg     [WIDTH-1:0]     sr[0:LENGTH-1];
-wire    [WIDTH-1:0]     sr_buf[0:LENGTH-1];
+wire    [WIDTH-1:0]     sr_next[0:LENGTH-1];
 
 //first stage
 always @(posedge i_EMUCLK) if(!i_CEN_n) begin
@@ -51,15 +51,14 @@ end
 genvar stage;
 generate
 for(stage = 0; stage < LENGTH-1; stage = stage + 1) begin : primitive_sr
-    assign sr_buf[stage] = sr[stage];
     always @(posedge i_EMUCLK) if(!i_CEN_n) begin
-        // sr[stage + 1] <= sr[stage];
-        sr[stage + 1] <= sr_buf[stage];
+        sr[stage + 1] <= sr_next[stage];
     end
 
     /* verilator lint_off GENUNNAMED */
     /* verilator lint_off PINMISSING */
     `ifdef SIM
+        assign sr_next[stage] = sr[stage];
     `else
         // Manual injection of the delay buffers (sky130_fd_sc_hd__dlygate4sd3_1)
         //  otherwise OpenLane will do it automatically,
@@ -67,7 +66,9 @@ for(stage = 0; stage < LENGTH-1; stage = stage + 1) begin : primitive_sr
         //  leading to a more complex layout and longer wiring!
         //
         // See: https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dlygate4sd3/README.html
-        sky130_fd_sc_hd__dlygate4sd3_1 sr_dlygate[WIDTH-1:0] ( .A(sr[stage]), .X(sr_buf[stage]) );
+        wire [WIDTH-1:0] sr_buf;
+        sky130_fd_sc_hd__dlygate4sd3_1 sr_dlygate[WIDTH-1:0] ( .A(sr[stage]), .X(sr_buf) );
+        assign sr_next[stage] = sr_buf;
     `endif
     /* verilator lint_on PINMISSING */
     /* verilator lint_on GENUNNAMED */
