@@ -124,9 +124,9 @@ assign  o_IMP_FLUC_SIGNED_RO = perc_dac_en ? dac_out : dac_zlv;
 //////  Accumulation DAC(16-bit signed)
 ////
 
-reg         [2:0]   cyc0_dly;
-reg                 dac_acc_en;
-reg signed  [13:0]  dac_acc; // 9+log2(5+6)=9+4=13bit => signed 14 bit
+// reg         [2:0]   cyc0_dly;
+// reg                 dac_acc_en;
+// reg signed  [13:0]  dac_acc; // 9+log2(5+6)=9+4=13bit => signed 14 bit
 // always @(posedge emuclk) 
 //     // if(!i_RST_n) begin
 //     //     dac_acc <= 14'sd0;
@@ -147,13 +147,13 @@ reg signed  [13:0]  dac_acc; // 9+log2(5+6)=9+4=13bit => signed 14 bit
 //     end end
 // end
 
-reg     [4:0]   dac_acc_outcyc;
-always @(posedge emuclk) if(!phi1ncen_n) begin
-    if(cyc0_dly[2]) dac_acc_outcyc <= 5'd0;
-    else dac_acc_outcyc <= dac_acc_outcyc + 5'd1;
+// reg     [4:0]   dac_acc_outcyc;
+// always @(posedge emuclk) if(!phi1ncen_n) begin
+//     if(cyc0_dly[2]) dac_acc_outcyc <= 5'd0;
+//     else dac_acc_outcyc <= dac_acc_outcyc + 5'd1;
 
-    if(dac_acc_outcyc == 5'd1) o_ACC_SIGNED_STRB <= 1'b1;
-    else if(dac_acc_outcyc == 5'd10) o_ACC_SIGNED_STRB <= 1'b0;
-end
+//     if(dac_acc_outcyc == 5'd1) o_ACC_SIGNED_STRB <= 1'b1;
+//     else if(dac_acc_outcyc == 5'd10) o_ACC_SIGNED_STRB <= 1'b0;
+// end
 
 endmodule
