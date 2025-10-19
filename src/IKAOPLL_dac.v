@@ -93,6 +93,8 @@ assign  o_REG_TEST_SNDDATA = snddata_signmag;
 always @(posedge emuclk) if(!phi1ncen_n) begin
     snddata_signmag[8] <= perc_sr_d[8];
     snddata_signmag[7:0] <= perc_sr_d[8] ? ~perc_sr_d[7:0] : perc_sr_d[7:0];
+
+    o_ACC_SIGNED <= {perc_sr_d[8:1], 8'b0};
 end
 
 //impulse control
@@ -124,25 +126,26 @@ assign  o_IMP_FLUC_SIGNED_RO = perc_dac_en ? dac_out : dac_zlv;
 
 reg         [2:0]   cyc0_dly;
 reg                 dac_acc_en;
-reg signed  [16:0]  dac_acc;
-always @(posedge emuclk) if(!phi1ncen_n) begin
-    cyc0_dly[0] <= i_CYCLE_00;
-    cyc0_dly[2:1] <= cyc0_dly[1:0];
+reg signed  [13:0]  dac_acc; // 9+log2(5+6)=9+4=13bit => signed 14 bit
+// always @(posedge emuclk) 
+//     // if(!i_RST_n) begin
+//     //     dac_acc <= 14'sd0;
+//     // end else 
+//     if(!phi1ncen_n) begin
+//     cyc0_dly[0] <= i_CYCLE_00;
+//     cyc0_dly[2:1] <= cyc0_dly[1:0];
 
-    dac_acc_en <= ~i_INHIBIT_FDBK;
-    
-    if(cyc0_dly[2]) begin
-        dac_acc <= 17'sd0;
+//     dac_acc_en <= ~i_INHIBIT_FDBK;
 
-             if(dac_acc >  17'sd32767) o_ACC_SIGNED <= 16'sd32767;
-        else if(dac_acc < -17'sd32768) o_ACC_SIGNED <= -16'sd32768;
-        else o_ACC_SIGNED <= dac_acc[15:0];
-    end
-    else begin if(dac_acc_en) begin
-        if(ro_ctrl_z) dac_acc <= dac_acc + ($signed(snddata_signmag[8] ? {1'b1, ~snddata_signmag[7:0]} : {1'b0, snddata_signmag[7:0]}) * i_ACC_SIGNED_ROVOL);
-        else          dac_acc <= dac_acc + ($signed(snddata_signmag[8] ? {1'b1, ~snddata_signmag[7:0]} : {1'b0, snddata_signmag[7:0]}) * i_ACC_SIGNED_MOVOL);
-    end end
-end
+//     if(cyc0_dly[2]) begin
+//         dac_acc <= 14'sd0; // "dithering" DAC {{6{dac_acc[13]}}, dac_acc[7:0]};
+//         o_ACC_SIGNED <= {dac_acc[12 -: 8], 8'b0};
+//     end
+//     else begin if(dac_acc_en) begin
+//         if(ro_ctrl_z) dac_acc <= dac_acc + ($signed(snddata_signmag[8] ? {1'b1, ~snddata_signmag[7:0]} : {1'b0, snddata_signmag[7:0]})); // REJ: * i_ACC_SIGNED_ROVOL);
+//         else          dac_acc <= dac_acc + ($signed(snddata_signmag[8] ? {1'b1, ~snddata_signmag[7:0]} : {1'b0, snddata_signmag[7:0]})); // REJ: * i_ACC_SIGNED_MOVOL);
+//     end end
+// end
 
 reg     [4:0]   dac_acc_outcyc;
 always @(posedge emuclk) if(!phi1ncen_n) begin
