@@ -94,7 +94,8 @@ always @(posedge emuclk) if(!phi1ncen_n) begin
     snddata_signmag[8] <= perc_sr_d[8];
     snddata_signmag[7:0] <= perc_sr_d[8] ? ~perc_sr_d[7:0] : perc_sr_d[7:0];
 
-    o_ACC_SIGNED <= {perc_sr_d[8:1], 8'b0};
+    o_ACC_SIGNED <= $signed({perc_sr_d[8:1], {8{perc_sr_d[0]}}});
+    o_ACC_SIGNED_STRB <= 1'b0;
 end
 
 //impulse control
