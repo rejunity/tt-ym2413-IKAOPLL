@@ -357,33 +357,33 @@ end
 //////  STATIC PHASE REGISTERS FOR DEBUGGING
 ////
 
-reg     [4:0]   debug_cyccntr = 5'd0;
-reg     [9:0]   debug_phasereg_static[0:17];
-always @(posedge emuclk) if(!phi1ncen_n) begin
-    if(i_CYCLE_21) debug_cyccntr <= 5'd0;
-    else debug_cyccntr <= debug_cyccntr + 5'd1;
+// reg     [4:0]   debug_cyccntr = 5'd0;
+// reg     [9:0]   debug_phasereg_static[0:17];
+// always @(posedge emuclk) if(!phi1ncen_n) begin
+//     if(i_CYCLE_21) debug_cyccntr <= 5'd0;
+//     else debug_cyccntr <= debug_cyccntr + 5'd1;
 
-    case(debug_cyccntr)
-        5'd0 : debug_phasereg_static[0]  <= o_OP_PHASE; //Ch.1 M
-        5'd3 : debug_phasereg_static[1]  <= o_OP_PHASE; //Ch.1 C
-        5'd1 : debug_phasereg_static[2]  <= o_OP_PHASE; //Ch.2 M
-        5'd4 : debug_phasereg_static[3]  <= o_OP_PHASE; //Ch.2 C
-        5'd2 : debug_phasereg_static[4]  <= o_OP_PHASE; //Ch.3 M
-        5'd5 : debug_phasereg_static[5]  <= o_OP_PHASE; //Ch.3 C
-        5'd6 : debug_phasereg_static[6]  <= o_OP_PHASE; //Ch.4 M
-        5'd9 : debug_phasereg_static[7]  <= o_OP_PHASE; //Ch.4 C
-        5'd7 : debug_phasereg_static[8]  <= o_OP_PHASE; //Ch.5 M
-        5'd10: debug_phasereg_static[9]  <= o_OP_PHASE; //Ch.5 C
-        5'd8 : debug_phasereg_static[10] <= o_OP_PHASE; //Ch.6 M
-        5'd11: debug_phasereg_static[11] <= o_OP_PHASE; //Ch.6 C
-        5'd12: debug_phasereg_static[12] <= o_OP_PHASE; //Ch.7 M | BD M
-        5'd15: debug_phasereg_static[13] <= o_OP_PHASE; //Ch.7 C | BD C
-        5'd13: debug_phasereg_static[14] <= o_OP_PHASE; //Ch.8 M | HH
-        5'd16: debug_phasereg_static[15] <= o_OP_PHASE; //Ch.8 C | SD
-        5'd14: debug_phasereg_static[16] <= o_OP_PHASE; //Ch.9 M | TT
-        5'd17: debug_phasereg_static[17] <= o_OP_PHASE; //Ch.9 C | TC
-        default: ;
-    endcase
-end
+//     case(debug_cyccntr)
+//         5'd0 : debug_phasereg_static[0]  <= o_OP_PHASE; //Ch.1 M
+//         5'd3 : debug_phasereg_static[1]  <= o_OP_PHASE; //Ch.1 C
+//         5'd1 : debug_phasereg_static[2]  <= o_OP_PHASE; //Ch.2 M
+//         5'd4 : debug_phasereg_static[3]  <= o_OP_PHASE; //Ch.2 C
+//         5'd2 : debug_phasereg_static[4]  <= o_OP_PHASE; //Ch.3 M
+//         5'd5 : debug_phasereg_static[5]  <= o_OP_PHASE; //Ch.3 C
+//         5'd6 : debug_phasereg_static[6]  <= o_OP_PHASE; //Ch.4 M
+//         5'd9 : debug_phasereg_static[7]  <= o_OP_PHASE; //Ch.4 C
+//         5'd7 : debug_phasereg_static[8]  <= o_OP_PHASE; //Ch.5 M
+//         5'd10: debug_phasereg_static[9]  <= o_OP_PHASE; //Ch.5 C
+//         5'd8 : debug_phasereg_static[10] <= o_OP_PHASE; //Ch.6 M
+//         5'd11: debug_phasereg_static[11] <= o_OP_PHASE; //Ch.6 C
+//         5'd12: debug_phasereg_static[12] <= o_OP_PHASE; //Ch.7 M | BD M
+//         5'd15: debug_phasereg_static[13] <= o_OP_PHASE; //Ch.7 C | BD C
+//         5'd13: debug_phasereg_static[14] <= o_OP_PHASE; //Ch.8 M | HH
+//         5'd16: debug_phasereg_static[15] <= o_OP_PHASE; //Ch.8 C | SD
+//         5'd14: debug_phasereg_static[16] <= o_OP_PHASE; //Ch.9 M | TT
+//         5'd17: debug_phasereg_static[17] <= o_OP_PHASE; //Ch.9 C | TC
+//         default: ;
+//     endcase
+// end
 
 endmodule

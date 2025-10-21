@@ -394,59 +394,59 @@ assign  o_OP_ATTNLV = cyc19r_final_attnlv;
 //////  STATIC ENVELOPE REGISTERS FOR DEBUGGING
 ////
 
-reg     [4:0]   debug_cyccntr = 5'd0;
-reg     [6:0]   debug_envreg_static[0:17];
-reg     [1:0]   debug_envstat_static[0:17];
-reg     [1:0]   debug_cyc2r_next_envstat;
-always @(posedge emuclk) if(!phi1ncen_n) begin
-    if(i_CYCLE_21) debug_cyccntr <= 5'd0;
-    else debug_cyccntr <= debug_cyccntr + 5'd1;
+// reg     [4:0]   debug_cyccntr = 5'd0;
+// reg     [6:0]   debug_envreg_static[0:17];
+// reg     [1:0]   debug_envstat_static[0:17];
+// reg     [1:0]   debug_cyc2r_next_envstat;
+// always @(posedge emuclk) if(!phi1ncen_n) begin
+//     if(i_CYCLE_21) debug_cyccntr <= 5'd0;
+//     else debug_cyccntr <= debug_cyccntr + 5'd1;
 
-    case(debug_cyccntr)
-        5'd1 : debug_envreg_static[0]  <= ~o_OP_ATTNLV; //Ch.1 M
-        5'd4 : debug_envreg_static[1]  <= ~o_OP_ATTNLV; //Ch.1 C
-        5'd2 : debug_envreg_static[2]  <= ~o_OP_ATTNLV; //Ch.2 M
-        5'd5 : debug_envreg_static[3]  <= ~o_OP_ATTNLV; //Ch.2 C
-        5'd3 : debug_envreg_static[4]  <= ~o_OP_ATTNLV; //Ch.3 M
-        5'd6 : debug_envreg_static[5]  <= ~o_OP_ATTNLV; //Ch.3 C
-        5'd7 : debug_envreg_static[6]  <= ~o_OP_ATTNLV; //Ch.4 M
-        5'd10: debug_envreg_static[7]  <= ~o_OP_ATTNLV; //Ch.4 C
-        5'd8 : debug_envreg_static[8]  <= ~o_OP_ATTNLV; //Ch.5 M
-        5'd11: debug_envreg_static[9]  <= ~o_OP_ATTNLV; //Ch.5 C
-        5'd9 : debug_envreg_static[10] <= ~o_OP_ATTNLV; //Ch.6 M
-        5'd12: debug_envreg_static[11] <= ~o_OP_ATTNLV; //Ch.6 C
-        5'd13: debug_envreg_static[12] <= ~o_OP_ATTNLV; //Ch.7 M | BD M
-        5'd16: debug_envreg_static[13] <= ~o_OP_ATTNLV; //Ch.7 C | BD C
-        5'd14: debug_envreg_static[14] <= ~o_OP_ATTNLV; //Ch.8 M | HH
-        5'd17: debug_envreg_static[15] <= ~o_OP_ATTNLV; //Ch.8 C | SD
-        5'd15: debug_envreg_static[16] <= ~o_OP_ATTNLV; //Ch.9 M | TT
-        5'd0 : debug_envreg_static[17] <= ~o_OP_ATTNLV; //Ch.9 C | TC
-        default: ;
-    endcase
+//     case(debug_cyccntr)
+//         5'd1 : debug_envreg_static[0]  <= ~o_OP_ATTNLV; //Ch.1 M
+//         5'd4 : debug_envreg_static[1]  <= ~o_OP_ATTNLV; //Ch.1 C
+//         5'd2 : debug_envreg_static[2]  <= ~o_OP_ATTNLV; //Ch.2 M
+//         5'd5 : debug_envreg_static[3]  <= ~o_OP_ATTNLV; //Ch.2 C
+//         5'd3 : debug_envreg_static[4]  <= ~o_OP_ATTNLV; //Ch.3 M
+//         5'd6 : debug_envreg_static[5]  <= ~o_OP_ATTNLV; //Ch.3 C
+//         5'd7 : debug_envreg_static[6]  <= ~o_OP_ATTNLV; //Ch.4 M
+//         5'd10: debug_envreg_static[7]  <= ~o_OP_ATTNLV; //Ch.4 C
+//         5'd8 : debug_envreg_static[8]  <= ~o_OP_ATTNLV; //Ch.5 M
+//         5'd11: debug_envreg_static[9]  <= ~o_OP_ATTNLV; //Ch.5 C
+//         5'd9 : debug_envreg_static[10] <= ~o_OP_ATTNLV; //Ch.6 M
+//         5'd12: debug_envreg_static[11] <= ~o_OP_ATTNLV; //Ch.6 C
+//         5'd13: debug_envreg_static[12] <= ~o_OP_ATTNLV; //Ch.7 M | BD M
+//         5'd16: debug_envreg_static[13] <= ~o_OP_ATTNLV; //Ch.7 C | BD C
+//         5'd14: debug_envreg_static[14] <= ~o_OP_ATTNLV; //Ch.8 M | HH
+//         5'd17: debug_envreg_static[15] <= ~o_OP_ATTNLV; //Ch.8 C | SD
+//         5'd15: debug_envreg_static[16] <= ~o_OP_ATTNLV; //Ch.9 M | TT
+//         5'd0 : debug_envreg_static[17] <= ~o_OP_ATTNLV; //Ch.9 C | TC
+//         default: ;
+//     endcase
 
-    debug_cyc2r_next_envstat <= cyc2c_next_envstat;
-    case(debug_cyccntr)
-        5'd2 : debug_envstat_static[0]  <= debug_cyc2r_next_envstat; //Ch.1 M
-        5'd5 : debug_envstat_static[1]  <= debug_cyc2r_next_envstat; //Ch.1 C
-        5'd3 : debug_envstat_static[2]  <= debug_cyc2r_next_envstat; //Ch.2 M
-        5'd6 : debug_envstat_static[3]  <= debug_cyc2r_next_envstat; //Ch.2 C
-        5'd4 : debug_envstat_static[4]  <= debug_cyc2r_next_envstat; //Ch.3 M
-        5'd7 : debug_envstat_static[5]  <= debug_cyc2r_next_envstat; //Ch.3 C
-        5'd8 : debug_envstat_static[6]  <= debug_cyc2r_next_envstat; //Ch.4 M
-        5'd11: debug_envstat_static[7]  <= debug_cyc2r_next_envstat; //Ch.4 C
-        5'd9 : debug_envstat_static[8]  <= debug_cyc2r_next_envstat; //Ch.5 M
-        5'd12: debug_envstat_static[9]  <= debug_cyc2r_next_envstat; //Ch.5 C
-        5'd10: debug_envstat_static[10] <= debug_cyc2r_next_envstat; //Ch.6 M
-        5'd13: debug_envstat_static[11] <= debug_cyc2r_next_envstat; //Ch.6 C
-        5'd14: debug_envstat_static[12] <= debug_cyc2r_next_envstat; //Ch.7 M | BD M
-        5'd17: debug_envstat_static[13] <= debug_cyc2r_next_envstat; //Ch.7 C | BD C
-        5'd15: debug_envstat_static[14] <= debug_cyc2r_next_envstat; //Ch.8 M | HH
-        5'd0 : debug_envstat_static[15] <= debug_cyc2r_next_envstat; //Ch.8 C | SD
-        5'd16: debug_envstat_static[16] <= debug_cyc2r_next_envstat; //Ch.9 M | TT
-        5'd1 : debug_envstat_static[17] <= debug_cyc2r_next_envstat; //Ch.9 C | TC
-        default: ;
-    endcase
-end
+//     debug_cyc2r_next_envstat <= cyc2c_next_envstat;
+//     case(debug_cyccntr)
+//         5'd2 : debug_envstat_static[0]  <= debug_cyc2r_next_envstat; //Ch.1 M
+//         5'd5 : debug_envstat_static[1]  <= debug_cyc2r_next_envstat; //Ch.1 C
+//         5'd3 : debug_envstat_static[2]  <= debug_cyc2r_next_envstat; //Ch.2 M
+//         5'd6 : debug_envstat_static[3]  <= debug_cyc2r_next_envstat; //Ch.2 C
+//         5'd4 : debug_envstat_static[4]  <= debug_cyc2r_next_envstat; //Ch.3 M
+//         5'd7 : debug_envstat_static[5]  <= debug_cyc2r_next_envstat; //Ch.3 C
+//         5'd8 : debug_envstat_static[6]  <= debug_cyc2r_next_envstat; //Ch.4 M
+//         5'd11: debug_envstat_static[7]  <= debug_cyc2r_next_envstat; //Ch.4 C
+//         5'd9 : debug_envstat_static[8]  <= debug_cyc2r_next_envstat; //Ch.5 M
+//         5'd12: debug_envstat_static[9]  <= debug_cyc2r_next_envstat; //Ch.5 C
+//         5'd10: debug_envstat_static[10] <= debug_cyc2r_next_envstat; //Ch.6 M
+//         5'd13: debug_envstat_static[11] <= debug_cyc2r_next_envstat; //Ch.6 C
+//         5'd14: debug_envstat_static[12] <= debug_cyc2r_next_envstat; //Ch.7 M | BD M
+//         5'd17: debug_envstat_static[13] <= debug_cyc2r_next_envstat; //Ch.7 C | BD C
+//         5'd15: debug_envstat_static[14] <= debug_cyc2r_next_envstat; //Ch.8 M | HH
+//         5'd0 : debug_envstat_static[15] <= debug_cyc2r_next_envstat; //Ch.8 C | SD
+//         5'd16: debug_envstat_static[16] <= debug_cyc2r_next_envstat; //Ch.9 M | TT
+//         5'd1 : debug_envstat_static[17] <= debug_cyc2r_next_envstat; //Ch.9 C | TC
+//         default: ;
+//     endcase
+// end
 
 
 endmodule

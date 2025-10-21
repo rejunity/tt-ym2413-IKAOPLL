@@ -240,35 +240,34 @@ end
 ///////////////////////////////////////////////////////////
 //////  STATIC OPWAVE REGISTERS FOR DEBUGGING
 ////
+// reg     [4:0]   debug_cyccntr = 5'd0;
+// reg     [11:0]  debug_opwavereg_static[0:17];
+// always @(posedge emuclk) if(!phi1ncen_n) begin
+//     if(i_CYCLE_21) debug_cyccntr <= 5'd0;
+//     else debug_cyccntr <= debug_cyccntr + 5'd1;
 
-reg     [4:0]   debug_cyccntr = 5'd0;
-reg     [11:0]  debug_opwavereg_static[0:17];
-always @(posedge emuclk) if(!phi1ncen_n) begin
-    if(i_CYCLE_21) debug_cyccntr <= 5'd0;
-    else debug_cyccntr <= debug_cyccntr + 5'd1;
-
-    case(debug_cyccntr)
-        5'd2 : debug_opwavereg_static[0]  <= cyc21c_intwave_flipped; //Ch.1 M
-        5'd5 : debug_opwavereg_static[1]  <= cyc21c_intwave_flipped; //Ch.1 C
-        5'd3 : debug_opwavereg_static[2]  <= cyc21c_intwave_flipped; //Ch.2 M
-        5'd6 : debug_opwavereg_static[3]  <= cyc21c_intwave_flipped; //Ch.2 C
-        5'd4 : debug_opwavereg_static[4]  <= cyc21c_intwave_flipped; //Ch.3 M
-        5'd7 : debug_opwavereg_static[5]  <= cyc21c_intwave_flipped; //Ch.3 C
-        5'd8 : debug_opwavereg_static[6]  <= cyc21c_intwave_flipped; //Ch.4 M
-        5'd11: debug_opwavereg_static[7]  <= cyc21c_intwave_flipped; //Ch.4 C
-        5'd9 : debug_opwavereg_static[8]  <= cyc21c_intwave_flipped; //Ch.5 M
-        5'd12: debug_opwavereg_static[9]  <= cyc21c_intwave_flipped; //Ch.5 C
-        5'd10: debug_opwavereg_static[10] <= cyc21c_intwave_flipped; //Ch.6 M
-        5'd13: debug_opwavereg_static[11] <= cyc21c_intwave_flipped; //Ch.6 C
-        5'd14: debug_opwavereg_static[12] <= cyc21c_intwave_flipped; //Ch.7 M | BD M
-        5'd17: debug_opwavereg_static[13] <= cyc21c_intwave_flipped; //Ch.7 C | BD C
-        5'd15: debug_opwavereg_static[14] <= cyc21c_intwave_flipped; //Ch.8 M | HH
-        5'd0 : debug_opwavereg_static[15] <= cyc21c_intwave_flipped; //Ch.8 C | SD
-        5'd16: debug_opwavereg_static[16] <= cyc21c_intwave_flipped; //Ch.9 M | TT
-        5'd1 : debug_opwavereg_static[17] <= cyc21c_intwave_flipped; //Ch.9 C | TC
-        default: ;
-    endcase
-end
+//     case(debug_cyccntr)
+//         5'd2 : debug_opwavereg_static[0]  <= cyc21c_intwave_flipped; //Ch.1 M
+//         5'd5 : debug_opwavereg_static[1]  <= cyc21c_intwave_flipped; //Ch.1 C
+//         5'd3 : debug_opwavereg_static[2]  <= cyc21c_intwave_flipped; //Ch.2 M
+//         5'd6 : debug_opwavereg_static[3]  <= cyc21c_intwave_flipped; //Ch.2 C
+//         5'd4 : debug_opwavereg_static[4]  <= cyc21c_intwave_flipped; //Ch.3 M
+//         5'd7 : debug_opwavereg_static[5]  <= cyc21c_intwave_flipped; //Ch.3 C
+//         5'd8 : debug_opwavereg_static[6]  <= cyc21c_intwave_flipped; //Ch.4 M
+//         5'd11: debug_opwavereg_static[7]  <= cyc21c_intwave_flipped; //Ch.4 C
+//         5'd9 : debug_opwavereg_static[8]  <= cyc21c_intwave_flipped; //Ch.5 M
+//         5'd12: debug_opwavereg_static[9]  <= cyc21c_intwave_flipped; //Ch.5 C
+//         5'd10: debug_opwavereg_static[10] <= cyc21c_intwave_flipped; //Ch.6 M
+//         5'd13: debug_opwavereg_static[11] <= cyc21c_intwave_flipped; //Ch.6 C
+//         5'd14: debug_opwavereg_static[12] <= cyc21c_intwave_flipped; //Ch.7 M | BD M
+//         5'd17: debug_opwavereg_static[13] <= cyc21c_intwave_flipped; //Ch.7 C | BD C
+//         5'd15: debug_opwavereg_static[14] <= cyc21c_intwave_flipped; //Ch.8 M | HH
+//         5'd0 : debug_opwavereg_static[15] <= cyc21c_intwave_flipped; //Ch.8 C | SD
+//         5'd16: debug_opwavereg_static[16] <= cyc21c_intwave_flipped; //Ch.9 M | TT
+//         5'd1 : debug_opwavereg_static[17] <= cyc21c_intwave_flipped; //Ch.9 C | TC
+//         default: ;
+//     endcase
+// end
 
 
 endmodule
