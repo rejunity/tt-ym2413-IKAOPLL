@@ -168,7 +168,7 @@ IKAOPLL_timinggen u_TIMINGGEN (
 //////  REGISTER
 ////
 
-IKAOPLL_reg #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .ALTPATCH_CONFIG_MODE(ALTPATCH_CONFIG_MODE), .INSTROM_STYLE(0)) u_REG (
+IKAOPLL_reg #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .ALTPATCH_CONFIG_MODE(ALTPATCH_CONFIG_MODE), .INSTROM_STYLE(2)) u_REG (
     .i_EMUCLK                   (emuclk                     ),
     .i_phiM_PCEN_n              (i_phiM_PCEN_n              ),
 
@@ -220,9 +220,9 @@ IKAOPLL_reg #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .ALTPATCH_CONFIG_MODE(ALTPA
     .o_SL                       (sl                         ),
 
     .o_EG_ENVCNTR_TEST_DATA     (eg_envcntr_test_data       )
-    // .i_REG_TEST_PHASE           (op_phase                   ),
-    // .i_REG_TEST_ATTNLV          (op_attnlv                  ),
-    // .i_REG_TEST_SNDDATA         (reg_test_snddata           )
+    // .i_REG_TEST_PHASE           (op_phase                   ), // REJ
+    // .i_REG_TEST_ATTNLV          (op_attnlv                  ), // REJ
+    // .i_REG_TEST_SNDDATA         (reg_test_snddata           )  // REJ
 );
 
 
