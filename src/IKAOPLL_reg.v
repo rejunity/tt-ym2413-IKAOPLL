@@ -305,7 +305,7 @@ IKAOPLL_instrom #(INSTROM_STYLE) u_instrom (
 
     //1 = use the optional VRC7 enable register, 0 = use value from off-chip
     // .i_ALTPATCH_EN              (ALTPATCH_CONFIG_MODE ? altpatch_en_reg : i_ALTPATCH_EN),
-    .i_ALTPATCH_EN              (1'b0), // REJ
+    // .i_ALTPATCH_EN              (1'b0), // REJ
 
     .i_INST_ADDR                (inst_reg                   ),
     .i_BD0_SEL(perc_proc_d), .i_HH_SEL(perc_proc[0]), .i_TT_SEL(perc_proc[1]), .i_BD1_SEL(perc_proc[2]), .i_SD_SEL(perc_proc[3]), .i_TC_SEL(perc_proc[4]), 
@@ -560,7 +560,7 @@ module IKAOPLL_instrom #(parameter INSTROM_STYLE = 0) (
     input   wire            i_EMUCLK,
     input   wire            i_phi1_PCEN_n, //positive!
 
-    input   wire            i_ALTPATCH_EN,
+    // input   wire            i_ALTPATCH_EN, // REJ
     input   wire    [3:0]   i_INST_ADDR,
     input   wire            i_BD0_SEL, i_HH_SEL, i_TT_SEL, i_BD1_SEL, i_SD_SEL, i_TC_SEL,
     input   wire            i_MnC_SEL, //1=MOD 0=CAR
@@ -580,22 +580,22 @@ module IKAOPLL_instrom #(parameter INSTROM_STYLE = 0) (
 ////
 
 wire            percussion_sel = |{i_BD0_SEL, i_HH_SEL, i_TT_SEL, i_BD1_SEL, i_SD_SEL, i_TC_SEL};
-reg     [5:0]   mem_addr;
+reg     [4:0]   mem_addr;
 
 always @(*) begin
     if(percussion_sel) begin
         case({i_BD0_SEL, i_HH_SEL, i_TT_SEL, i_BD1_SEL, i_SD_SEL, i_TC_SEL})
-            6'b100000: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h0};
-            6'b010000: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h1};
-            6'b001000: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h2};
-            6'b000100: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h3};
-            6'b000010: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h4};
-            6'b000001: mem_addr = {i_ALTPATCH_EN, 1'b1, 4'h5};
-            default:   mem_addr = {i_ALTPATCH_EN, 1'b1, 4'hF};
+            6'b100000: mem_addr = {1'b1, 4'h0};
+            6'b010000: mem_addr = {1'b1, 4'h1};
+            6'b001000: mem_addr = {1'b1, 4'h2};
+            6'b000100: mem_addr = {1'b1, 4'h3};
+            6'b000010: mem_addr = {1'b1, 4'h4};
+            6'b000001: mem_addr = {1'b1, 4'h5};
+            default:   mem_addr = {1'b1, 4'hF};
         endcase
     end
     else begin
-        mem_addr = {i_ALTPATCH_EN, 1'b0, i_INST_ADDR};
+        mem_addr = {1'b0, i_INST_ADDR};
     end
 end
 
