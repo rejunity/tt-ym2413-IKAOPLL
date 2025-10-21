@@ -15,7 +15,8 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-  assign uo_out       = { o_ikaopll_main[15 -: 8] };
+  // assign uo_out       = { o_ikaopll_main[15 -: 8] };
+  assign uo_out       = { o_ikaopll_main[15], 7'b0 }; // temporarily emulate PWM-only output
   assign uio_out[7:3] = 5'b0; // assign uio_out[7:3] = { o_ikaopll_main[7 : 5], o_DAC_EN_RO, o_DAC_EN_MO };
   assign uio_out[2:0] = 3'b0;
   assign uio_oe       = 8'b1111_1000; // (active high: 0=input, 1=output)
