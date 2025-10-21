@@ -160,7 +160,7 @@ IKAOPLL #(
 
     .i_IC_n                     (IC_n                       ),
 
-    .i_ALTPATCH_EN              (1'b0                       ),
+    // .i_ALTPATCH_EN              (1'b0                       ), // REJ
 
     .i_CS_n                     (CS_n                       ),
     .i_WR_n                     (WR_n                       ),

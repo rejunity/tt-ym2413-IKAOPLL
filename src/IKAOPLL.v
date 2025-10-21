@@ -15,7 +15,7 @@ module IKAOPLL #(
     input   wire                i_IC_n,
 
     //VRC7 patch enable
-    input   wire                i_ALTPATCH_EN,
+    // input   wire                i_ALTPATCH_EN,
 
     //bus control and address
     input   wire                i_CS_n,
@@ -185,7 +185,7 @@ IKAOPLL_reg #(.FULLY_SYNCHRONOUS(FULLY_SYNCHRONOUS), .ALTPATCH_CONFIG_MODE(ALTPA
     .o_D                        (o_D                        ),
     .o_D_OE                     (o_D_OE                     ),
 
-    .i_ALTPATCH_EN              (i_ALTPATCH_EN              ),
+    // .i_ALTPATCH_EN              (i_ALTPATCH_EN              ), //REJ
 
     .i_CYCLE_00                 (cycle_00                   ),
     .i_CYCLE_12                 (cycle_12                   ),
