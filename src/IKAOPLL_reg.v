@@ -448,6 +448,9 @@ end
 //////  Test data serializer
 ////
 
+assign  o_D[0] = 1'b0;
+assign  o_D[1] = 1'b0;
+
 // reg     [16:0]  d0_testreg;
 // reg     [8:0]   d1_testreg;
 // assign  o_D[0] = d0_testreg[0];
