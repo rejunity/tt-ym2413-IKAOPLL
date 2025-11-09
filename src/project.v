@@ -5,6 +5,36 @@
 
 `default_nettype none
 
+// A first-order sigma-delta modulator
+// It resembles a PWM, but actually is a PDM (Pulse Density Modulation)
+// https://en.wikipedia.org/wiki/Pulse-density_modulation
+// 
+// Implementaion based on https://www.fpga4fun.com/PWM_DAC_2.html
+
+module pwm #( parameter VALUE_BITS = 8 ) (
+    input  wire clk,
+    input  wire reset,
+
+    input  wire [VALUE_BITS-1:0]  value,
+
+    output wire out
+);
+    localparam ACCUMULATOR_BITS = VALUE_BITS + 1;
+    reg [ACCUMULATOR_BITS-1:0] accumulator;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            accumulator <= 0;
+        end else begin
+            // greater the value, the more often accumulator overflows
+            // every time the accumulator overflows, PDM outputs 1
+            accumulator <= accumulator[VALUE_BITS-1:0] + value;
+        end
+    end
+
+    assign out = accumulator[ACCUMULATOR_BITS-1]; // an overflow bit of the accumulator is the output of PDM
+endmodule
+
 module tt_um_rejunity_ym2413_ika_opll (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -16,10 +46,12 @@ module tt_um_rejunity_ym2413_ika_opll (
     input  wire       rst_n     // reset_n - low to reset
 );
   // assign uo_out       = { o_D_OE, o_D, o_DAC_EN_MO, o_DAC_EN_RO, o_ikaopll_main[10: 8] };//o_ikaopll_main[15: 8];
-  // assign uio_out[7:3] = o_ikaopll_main[7 : 3];
-  assign uo_out       = { o_ikaopll_main[15: 8] };
-  assign uio_out[7:3] = { o_ikaopll_main[7 : 3] };
-  assign uio_out[2:0] = 3'b0;
+  // assign uo_out       = { o_ikaopll_main[15: 8] };
+  // assign uio_out[7:3] = { o_ikaopll_main[7 : 3] };
+  assign uo_out       = o_dac_9bit[8:1]; 
+  assign uio_out[7]   = o_pwm_1bit;
+  assign uio_out[6:3] = 4'b0; // unused bits
+  assign uio_out[2:0] = 3'b0; // input bits
   assign uio_oe       = 8'b1111_1000; // (active high: 0=input, 1=output)
 
   ///////////////////////////////////////////////////////////
@@ -134,7 +166,18 @@ module tt_um_rejunity_ym2413_ika_opll (
   wire _unused = &{ena, 1'b0};
 
 
-// main chip
+  // outputs
+  wire [8:0]     o_dac_9bit = {o_IMP_NOFLUC_SIGN, o_IMP_NOFLUC_SIGN ? ~o_IMP_NOFLUC_MAG : o_IMP_NOFLUC_MAG};
+  wire           o_pwm_1bit;
+  
+  pwm #(.VALUE_BITS(9)) pwm_master (
+        .clk(clk),
+        .reset(~rst_n),
+        .value(o_dac_9bit),
+        .out(o_pwm_1bit)
+  );
+
+  // main chip
   wire                o_XOUT;
   wire        [1:0]   o_D;
   wire                o_D_OE;
@@ -145,11 +188,10 @@ module tt_um_rejunity_ym2413_ika_opll (
   wire signed [9:0]   o_IMP_FLUC_SIGNED_MO;
   wire signed [9:0]   o_IMP_FLUC_SIGNED_RO;
   wire                o_ACC_SIGNED_STRB;
-  wire signed [15:0]  o_ikaopll_main;
-  wire        [16:0]  o_ikaopll_main_centered = 17'sd32767 + o_ikaopll_main;
+  wire signed [15:0]  o_ACC_SIGNED;
+
 IKAOPLL #(
     .FULLY_SYNCHRONOUS          (1                          ),
-    // OLD: .FAST_RESET                 (1                          ),
     .FAST_RESET                 (0                          ),
     .ALTPATCH_CONFIG_MODE       (0                          ), // VRC7 patch enable
     .USE_PIPELINED_MULTIPLIER   (1                          )
@@ -180,7 +222,8 @@ IKAOPLL #(
     .i_ACC_SIGNED_MOVOL         (5'sd10                     ),
     .i_ACC_SIGNED_ROVOL         (5'sd15                     ),
     .o_ACC_SIGNED_STRB                                       ,
-    .o_ACC_SIGNED               (o_ikaopll_main             )
+    .o_ACC_SIGNED
 );
+
 
 endmodule
