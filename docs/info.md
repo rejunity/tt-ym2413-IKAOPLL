@@ -11,4 +11,6 @@ TODO, but meanwhile see https://github.com/ika-musume/IKAOPLL/blob/main/README.m
 
 ## External hardware
 
-TODO: List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+Use either 
+a) Audio PMOD on BIRIDIRECTIONAL pins
+b) R2D DAC on OUTPUT pins

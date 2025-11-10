@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "YM2413"
-  author:       "IKA Microelectronics Inc. & Renaldas Zioma"
-  discord:      "rzioma"
-  description:  "YM2413 FM Synth (IKA OPLL core)"
+  title:        "YM2413 FM synthesis audio chip"
+  author:       "Sehyeon Kim, IKA Microelectronics Inc. & Renaldas Zioma (TT/ASIC)"
+  discord:      "raki1892, rzioma"
+  description:  "The YM2413 is the OPL (FM Operator Type-L) series FM synthesis audio chip built using IKA OPLL core implementation."
   language:     "Verilog"
   clock_hz:     3579545   # NTSC clock frequency as master clock
 
@@ -43,14 +43,14 @@ pinout:
   ui[7]: "D7 data bus"
 
   # Outputs
-  uo[0]: "DAC output (LSB)"
+  uo[0]: "DAC output *(LSB)*"
   uo[1]: "DAC output"
   uo[2]: "DAC output"
   uo[3]: "DAC output"
   uo[4]: "DAC output"
   uo[5]: "DAC output"
   uo[6]: "DAC output"
-  uo[7]: "DAC output (MSB)"
+  uo[7]: "DAC output *(MSB)*"
 
   # Bidirectional pins
   uio[0]: "(in) **A0** register latch"
@@ -60,7 +60,7 @@ pinout:
   uio[4]: ""
   uio[5]: ""
   uio[6]: ""
-  uio[7]: "(out) PWM"
+  uio[7]: "(out) PWM output *(Audio PMOD compatible)*"
 
 # Do not change!
 yaml_version: 6
