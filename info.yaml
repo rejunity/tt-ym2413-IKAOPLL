@@ -43,14 +43,14 @@ pinout:
   ui[7]: "D7 data bus"
 
   # Outputs
-  uo[0]: "DAC LSB"
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: "DAC MSB"
+  uo[0]: "DAC output (LSB)"
+  uo[1]: "DAC output"
+  uo[2]: "DAC output"
+  uo[3]: "DAC output"
+  uo[4]: "DAC output"
+  uo[5]: "DAC output"
+  uo[6]: "DAC output"
+  uo[7]: "DAC output (MSB)"
 
   # Bidirectional pins
   uio[0]: "(in) **A0** register latch"
