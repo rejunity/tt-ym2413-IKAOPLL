@@ -51,7 +51,7 @@ async def reset(dut):
     # According to YM2413 Application Manual
     # (page 25, "AC Characteristics" & Figure A - 2 "Reset Timing")
     # RESET pulse width must be not shorter than 80 cycles
-    await ClockCycles(dut.clk, 100) # should be 80, but DAC doesn't seem to be completely initisalized for 16-20 cycles more
+    await ClockCycles(dut.clk, 80 + 180) # should be 80, but DAC doesn't seem to be completely initisalized for 16-20 cycles more
     dut.rst_n.value = 1
     dut.uio_in.value = 0b000 # WR=0, CS=0, A0=0
 
