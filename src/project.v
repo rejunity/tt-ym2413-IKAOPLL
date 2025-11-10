@@ -138,12 +138,29 @@ module tt_um_rejunity_ym2413_ika_opll (
 
   // outputs
   wire [8:0]     o_dac_9bit = 9'h100 + {o_IMP_NOFLUC_SIGN, o_IMP_NOFLUC_SIGN ? ~o_IMP_NOFLUC_MAG : o_IMP_NOFLUC_MAG};
+  wire [15:0]    o_dac_18bit = 16'h8000 + o_ACC_SIGNED;
   wire           o_pwm_1bit;
   
-  pwm #(.VALUE_BITS(9)) pwm_master (
+  // pwm #(.VALUE_BITS(9)) pwm_master (
+  //       .clk(clk),
+  //       .reset(~rst_n),
+  //       .value(o_dac_9bit),
+  //       .out(o_pwm_1bit)
+  // );
+
+  // wire                o_pwm2_1bit;
+
+  // pwm #(.VALUE_BITS(16)) pwm2_master (
+  //       .clk(clk),
+  //       .reset(~rst_n),
+  //       .value(o_dac_18bit),
+  //       .out(o_pwm2_1bit)
+  // );
+
+  pwm #(.VALUE_BITS(16)) pwm_master (
         .clk(clk),
         .reset(~rst_n),
-        .value(o_dac_9bit),
+        .value(o_dac_18bit),
         .out(o_pwm_1bit)
   );
 
