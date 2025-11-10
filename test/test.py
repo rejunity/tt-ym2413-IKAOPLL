@@ -14,15 +14,15 @@ NTSC_FREQ = 3_579_545
 async def set_register(dut, reg, value, wait = 84, wait_between_writes = 12):
     async def write(dut, a0, value):
         # MSB [..., WR, CS, A0] LSB
-        dut.uio_in.value = 0b000 | a0   # @(posedge i_CLK) o_A0 = i_TARGET_ADDR;
+        dut.uio_in.value = 0b110 | a0   # @(posedge i_CLK) o_A0 = i_TARGET_ADDR;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b010 | a0   # @(negedge i_CLK) o_CS_n = 1'b0;
+        dut.uio_in.value = 0b100 | a0   # @(negedge i_CLK) o_CS_n = 1'b0;
         await ClockCycles(dut.clk, 1)
         dut.ui_in.value = value         # @(posedge i_CLK) o_DATA = i_WRITE_DATA;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b110 | a0   # @(negedge i_CLK) o_WR_n = 1'b0;
+        dut.uio_in.value = 0b000 | a0   # @(negedge i_CLK) o_WR_n = 1'b0;
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0b000 | a0   # @(negedge i_CLK) o_WR_n = 1'b1; o_CS_n = 1'b1;
+        dut.uio_in.value = 0b110 | a0   # @(negedge i_CLK) o_WR_n = 1'b1; o_CS_n = 1'b1;
         await ClockCycles(dut.clk, 1)
         # TODO: set data bus to high impedance @(posedge i_CLK) o_DATA = 8'hZZ;
 
@@ -53,7 +53,7 @@ async def reset(dut):
     # RESET pulse width must be not shorter than 80 cycles
     await ClockCycles(dut.clk, 80 + 180) # should be 80, but DAC doesn't seem to be completely initisalized for 16-20 cycles more
     dut.rst_n.value = 1
-    dut.uio_in.value = 0b000 # WR=0, CS=0, A0=0
+    dut.uio_in.value = 0b110 # /WR=1, /CS=1, A0=0
 
     return clock
 

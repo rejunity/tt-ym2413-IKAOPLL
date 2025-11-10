@@ -52,8 +52,8 @@ module tb ();
   wire            IC   =  ~rst_n;
   wire [7:0]      DIN  =  ui_in;
   wire            A0   =  uio_in[0];
-  wire            CS   =  uio_in[1];
-  wire            WR   =  uio_in[2];
+  wire            CS_n =  uio_in[1];
+  wire            WR_n =  uio_in[2];
 
   // wire            melody = uio_out[3];
   // wire            rhytm  = uio_out[4];

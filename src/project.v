@@ -129,8 +129,8 @@ module tt_um_rejunity_ym2413_ika_opll (
   wire            IC_n =  rst_n; // chip reset
   wire [7:0]      DIN  =  ui_in;
   wire            A0   =  uio_in[0];
-  wire            CS_n = ~uio_in[1];
-  wire            WR_n = ~uio_in[2];
+  wire            CS_n =  uio_in[1];
+  wire            WR_n =  uio_in[2];
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, 1'b0};

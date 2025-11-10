@@ -54,8 +54,8 @@ pinout:
 
   # Bidirectional pins
   uio[0]: "(in) **A0** register latch"
-  uio[1]: "(in) **CS** chip select"
-  uio[2]: "(in) **WR** write"
+  uio[1]: "(in) **/CS** chip select *(active low)*"
+  uio[2]: "(in) **/WR** write *(active low)*"
   uio[3]: ""
   uio[4]: ""
   uio[5]: ""
