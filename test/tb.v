@@ -55,8 +55,49 @@ module tb ();
   wire            CS   =  uio_in[1];
   wire            WR   =  uio_in[2];
 
-  wire            melody = uio_out[3];
-  wire            rhytm  = uio_out[4];
-  wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out[7:5]});
+  // wire            melody = uio_out[3];
+  // wire            rhytm  = uio_out[4];
+  // wire [16:0]     master_out = 16'sd32767 + $signed({uo_out, uio_out[7:5]});
+
+  reg [16:0]      master_out;
+  reg [16:0]      master_acc;
+  reg [6:0]       master_counter;
+  wire            master_strobe = (master_counter == 71);
+  always @(posedge clk) begin
+      if (~rst_n) begin
+          master_out <= 72*128;
+          master_acc <= 0;
+          master_counter <= 0;
+      end else if (master_strobe) begin
+          master_out <= master_acc;
+          master_acc <= 0;
+          master_counter <= 0;
+      end else begin
+        master_acc <= master_acc + uo_out;
+        // master_acc <= master_acc + {9'b0, (uo_out[7] ? ~uo_out[6:0] : uo_out[6:0])};
+        master_counter <= master_counter + 1;
+      end
+  end
+
+  reg [18:0]      pwm_acc;
+  always @(posedge clk) begin
+      if (~rst_n) begin
+          pwm_acc <= 16'h2A2A * 4;
+      end else begin
+          // pwm_acc <= { uio_out[7], pwm_acc[17:1] };
+          // pwm_acc <= (uio_out[7] << 8) + (pwm_acc * 15) / 16;
+          pwm_acc <= (uio_out[7] << 10) + (pwm_acc * 253) / 256;      // 0.98828 approx a=0.98748
+          // pwm_acc <= (uio_out[7] << 10) + (pwm_acc * 4042) / 4096; 
+      end
+  end
+
+  reg [18:0]      pwm2_acc;
+  always @(posedge clk) begin
+      if (~rst_n) begin
+          pwm2_acc <= 16'h2A2A * 4;
+      end else begin
+          pwm2_acc <= (uio_out[6] << 10) + (pwm2_acc * 253) / 256;      // 0.98828 approx a=0.98748
+      end
+  end
 
 endmodule
